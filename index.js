@@ -1,8 +1,6 @@
 const express = require('express');
 const nodemailer = require('nodemailer');
 const cors = require('cors');
-const multer = require('multer');
-const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -13,18 +11,6 @@ if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
   console.error('Missing EMAIL_USER or EMAIL_PASS in .env');
   process.exit(1);
 }
-
-// Multer setup for resume uploads
-const upload = multer({
-  dest: 'uploads/',
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-  fileFilter: (req, file, cb) => {
-    const allowed = ['.pdf', '.doc', '.docx'];
-    const ext = path.extname(file.originalname).toLowerCase();
-    if (allowed.includes(ext)) cb(null, true);
-    else cb(new Error('Only PDF, DOC, DOCX files are allowed'));
-  }
-});
 
 // Middleware
 app.use(cors({
@@ -143,9 +129,8 @@ app.post('/api/schedule-meetup', (req, res) => {
 });
 
 // Internship API
-app.post('/api/apply-internship', upload.single('resume'), (req, res) => {
-  const { name, email, phone, college, department, domain, reason } = req.body;
-  const resumeFile = req.file;
+app.post('/api/apply-internship', (req, res) => {
+  const { name, email, phone, college, department, year, message } = req.body;
 
   const subject = `Internship Application - ${name}`;
   const text = `
@@ -154,9 +139,8 @@ app.post('/api/apply-internship', upload.single('resume'), (req, res) => {
     Phone: ${phone}
     College: ${college}
     Department: ${department}
-    Domain: ${domain}
-    Reason: ${reason}
-    Resume File: ${resumeFile?.originalname || 'Not attached'}
+    Year: ${year}
+    Message: ${message}
   `;
 
   const html = `
@@ -166,9 +150,8 @@ app.post('/api/apply-internship', upload.single('resume'), (req, res) => {
     <p><strong>Phone:</strong> ${phone}</p>
     <p><strong>College:</strong> ${college}</p>
     <p><strong>Department:</strong> ${department}</p>
-    <p><strong>Domain:</strong> ${domain}</p>
-    <p><strong>Reason:</strong><br/>${reason}</p>
-    <p><strong>Resume File:</strong> ${resumeFile?.originalname || 'Not attached'}</p>
+    <p><strong>Year:</strong> ${year}</p>
+    <p><strong>Message:</strong><br/>${message}</p>
   `;
 
   sendMail({ subject, text, html }, res, 'Internship application sent successfully');
@@ -177,4 +160,4 @@ app.post('/api/apply-internship', upload.single('resume'), (req, res) => {
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-});  
+}); 
