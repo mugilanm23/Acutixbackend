@@ -14,7 +14,7 @@ if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
 
 // Middleware
 app.use(cors({
-  origin: ['https://acutix-website.vercel.app/'], // replace with your frontend domain
+  origin: ['https://acutix-website.vercel.app'], // replace with your frontend domain
   methods: ['GET','POST'],
   credentials: true
 }));
@@ -130,7 +130,7 @@ app.post('/api/schedule-meetup', (req, res) => {
 
 // Internship API
 app.post('/api/apply-internship', (req, res) => {
-  const { name, email, phone, college, department, year, message } = req.body;
+  const { name, email, phone, college, department,year, domain, message } = req.body;
 
   const subject = `Internship Application - ${name}`;
   const text = `
@@ -139,7 +139,8 @@ app.post('/api/apply-internship', (req, res) => {
     Phone: ${phone}
     College: ${college}
     Department: ${department}
-    Year: ${year}
+    Year:${year}
+    Domain: ${domain}
     Message: ${message}
   `;
 
@@ -151,6 +152,7 @@ app.post('/api/apply-internship', (req, res) => {
     <p><strong>College:</strong> ${college}</p>
     <p><strong>Department:</strong> ${department}</p>
     <p><strong>Year:</strong> ${year}</p>
+    <p><strong>Domain:</strong> ${domain}</p>
     <p><strong>Message:</strong><br/>${message}</p>
   `;
 
