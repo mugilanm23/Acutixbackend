@@ -14,7 +14,7 @@ if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
 
 // Middleware
 app.use(cors({
-  origin: ['https://acutix-website.vercel.app'], // your frontend
+  origin: ['https://www.digitaltouchcorp.com/'], // your frontend
   methods: ['GET', 'POST'],
   credentials: true
 }));
