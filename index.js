@@ -14,13 +14,13 @@ if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
 
 // Middleware
 app.use(cors({
-  origin: ['https://acutix-website.vercel.app'], // replace with your frontend domain
-  methods: ['GET','POST'],
+  origin: ['https://acutix-website.vercel.app'], // your frontend
+  methods: ['GET', 'POST'],
   credentials: true
 }));
 app.use(express.json());
 
-// Reusable mail transporter
+// Nodemailer Transporter
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -29,7 +29,12 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// Utility to send email
+// Basic Health Check
+app.get('/', (req, res) => {
+  res.status(200).send('Backend is working!');
+});
+
+// Universal Email Sender
 function sendMail({ subject, text, html }, res, successMessage) {
   const mailOptions = {
     from: process.env.EMAIL_USER,
@@ -42,26 +47,17 @@ function sendMail({ subject, text, html }, res, successMessage) {
   transporter.sendMail(mailOptions, (err) => {
     if (err) {
       console.error('Mail error:', err);
-      return res.status(500).json({ message: 'Failed to send mail.' });
+      return res.sendStatus(500);
     }
     res.status(200).json({ message: successMessage });
   });
 }
 
-// Contact form API
+// Contact API
 app.post('/api/contact', (req, res) => {
   const { firstName, lastName, email, phone, helpType, additionalInfo } = req.body;
 
   const subject = `New Contact: ${helpType}`;
-  const text = `
-    First Name: ${firstName}
-    Last Name: ${lastName}
-    Email: ${email}
-    Phone: ${phone}
-    Purpose: ${helpType}
-    Additional Info: ${additionalInfo || 'N/A'}
-  `;
-
   const html = `
     <h3>Contact Form Submission</h3>
     <p><strong>Name:</strong> ${firstName} ${lastName}</p>
@@ -71,23 +67,14 @@ app.post('/api/contact', (req, res) => {
     <p><strong>Additional Info:</strong><br/>${additionalInfo || 'N/A'}</p>
   `;
 
-  sendMail({ subject, text, html }, res, 'Form submitted successfully!');
+  sendMail({ subject, text: html, html }, res, 'Form submitted successfully!');
 });
 
-// Schedule call/meeting API
+// Schedule API
 app.post('/api/schedule', (req, res) => {
   const { name, email, type, date, time, additionalInfo } = req.body;
 
   const subject = `New ${type} Request`;
-  const text = `
-    Name: ${name}
-    Email: ${email}
-    Type: ${type}
-    Date: ${date}
-    Time: ${time}
-    Additional Info: ${additionalInfo || 'N/A'}
-  `;
-
   const html = `
     <h3>Schedule Request</h3>
     <p><strong>Name:</strong> ${name}</p>
@@ -98,23 +85,14 @@ app.post('/api/schedule', (req, res) => {
     <p><strong>Additional Info:</strong><br/>${additionalInfo || 'N/A'}</p>
   `;
 
-  sendMail({ subject, text, html }, res, 'Schedule request submitted successfully!');
+  sendMail({ subject, text: html, html }, res, 'Schedule request submitted successfully!');
 });
 
-// Tech meetup API
+// Meetup API
 app.post('/api/schedule-meetup', (req, res) => {
   const { topic, date, time, host, mode, description } = req.body;
 
   const subject = `Tech Meetup Scheduled: ${topic}`;
-  const text = `
-    Topic: ${topic}
-    Date: ${date}
-    Time: ${time}
-    Host: ${host}
-    Mode: ${mode}
-    Description: ${description}
-  `;
-
   const html = `
     <h3>Tech Meetup Request</h3>
     <p><strong>Topic:</strong> ${topic}</p>
@@ -125,25 +103,14 @@ app.post('/api/schedule-meetup', (req, res) => {
     <p><strong>Description:</strong><br/>${description}</p>
   `;
 
-  sendMail({ subject, text, html }, res, 'Meetup mail sent successfully');
+  sendMail({ subject, text: html, html }, res, 'Meetup mail sent successfully');
 });
 
 // Internship API
 app.post('/api/apply-internship', (req, res) => {
-  const { name, email, phone, college, department,year, domain, message } = req.body;
+  const { name, email, phone, college, department, year, domain, message } = req.body;
 
   const subject = `Internship Application - ${name}`;
-  const text = `
-    Name: ${name}
-    Email: ${email}
-    Phone: ${phone}
-    College: ${college}
-    Department: ${department}
-    Year:${year}
-    Domain: ${domain}
-    Message: ${message}
-  `;
-
   const html = `
     <h3>Internship Application</h3>
     <p><strong>Name:</strong> ${name}</p>
@@ -156,10 +123,10 @@ app.post('/api/apply-internship', (req, res) => {
     <p><strong>Message:</strong><br/>${message}</p>
   `;
 
-  sendMail({ subject, text, html }, res, 'Internship application sent successfully');
+  sendMail({ subject, text: html, html }, res, 'Internship application sent successfully');
 });
 
-// Start server
+// Start Server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-}); 
+});
