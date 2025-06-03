@@ -126,16 +126,6 @@ app.post('/api/apply-internship', (req, res) => {
   sendMail({ subject, text: html, html }, res, 'Internship application sent successfully');
 });
 
-const path = require('path');
-
-// Serve frontend static files (Vite build output)
-app.use(express.static(path.resolve(__dirname, 'dist')));
-
-// Handle SPA routing fallback (React Router)
-app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
-});
-
 
 // Start Server
 app.listen(PORT, () => {
