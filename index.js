@@ -14,8 +14,11 @@ if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
 
 // Middleware
 app.use(cors({
-  origin: ['https://www.acutixsoft.com/'], // your frontend
-  methods: ['GET', 'POST'],
+  origin: [ 'https://acutixsoft.com',
+  'https://www.acutixsoft.com',
+  'https://acutix-website.vercel.app'
+  ], // your frontend
+  methods: ['GET', 'POST','PUT','DELETE'],
   credentials: true
 }));
 app.use(express.json());
